@@ -1,8 +1,9 @@
 import dotenv from "dotenv";
 dotenv.config();
-import config from "../config";
 import fs from "fs";
 import path from "path";
+global.appRoot = path.resolve(__dirname, "..");
+import config from "../config";
 import {
   Client,
   CollectorFilter,
@@ -22,16 +23,21 @@ import {
 } from "@discordjs/voice";
 import youtubedl from "youtube-dl-exec";
 import { EventEmitter } from "events";
-import { IVideoSuggestion } from "./interfaces/IVideoSuggestion";
 import { IVideoMessageComponent } from "./interfaces/IVideoMessageComponent";
 import { shouldBotTrigger, getMessagePayload } from "./utils/botMessage";
-import searchVideos from "./utils/youtube/searchVideos";
-import { getVideoURL, getVideoIdFromURL } from "./utils/youtube/urlUtils";
+import { getVideo, searchVideos } from "./utils/youtube/videoService";
+import {
+  getVideoURL,
+  getVideoIdFromURL,
+  isValidHttpUrl,
+} from "./utils/youtube/urlUtils";
 import Queue from "./utils/Queue";
 import COMMANDS from "./enums/commands";
 import Levels from "./enums/levels";
+import formatVideoSuggestion from "./utils/botMessage/formatVideoSuggestions";
+import { loadYT_API_Key } from "./yt_api_service";
 
-global.appRoot = path.resolve(__dirname, "..");
+loadYT_API_Key();
 
 const main = async () => {
   // GuildID -> VideoMessageComponent
@@ -48,11 +54,6 @@ const main = async () => {
     ],
   });
 
-  /**
-   * TODO
-   * Skip, Check Queue, Volume Levels,
-   */
-
   await client.login(config.token);
 
   client.once(Events.ClientReady, (c) => {
@@ -61,6 +62,7 @@ const main = async () => {
     console.log(`Ready! Logged in as ${c.user.tag}`);
   });
 
+  /// Event emiiter for handling the audio player's pause and resume functionality.
   const playerStatusEmitter = new EventEmitter();
 
   const play = async (videoMessageComponent: IVideoMessageComponent) => {
@@ -92,8 +94,7 @@ const main = async () => {
       `./outputs/${options.videoId}.mp3`
     );
 
-    // console.log("Hitting YT DL", outputPath)
-    await youtubedl.exec(youtube_url, {
+    const status = await youtubedl.exec(youtube_url, {
       noCheckCertificates: true,
       noWarnings: true,
       preferFreeFormats: true,
@@ -127,6 +128,7 @@ const main = async () => {
     const queue = music_queue.get(guildId);
     queue.pause();
     playerStatusEmitter.emit("pause");
+    message.channel.send("Player paused ⏸");
   };
 
   const resume = (message: IVideoMessageComponent["message"]) => {
@@ -134,15 +136,18 @@ const main = async () => {
     const queue = music_queue.get(guildId);
     queue.resume();
     playerStatusEmitter.emit("resume");
+    message.channel.send("Player resumed ⏯");
   };
 
   const deque = (message: IVideoMessageComponent["message"]) => {
     const { guildId } = message;
     const queue = music_queue.get(guildId);
-    if (queue.isEmpty()) return;
-    if (!queue.isPlaying) return;
 
-    const videoMessageComponent = queue.dequeue();
+    queue.dequeue();
+
+    if (queue.isEmpty() || !queue.isPlaying) return;
+
+    const videoMessageComponent = queue.peek();
     play(videoMessageComponent);
   };
 
@@ -158,72 +163,50 @@ const main = async () => {
 
     queue.enqueue(videoMessageComponent);
 
-    if (enquedSize == 0) play(videoMessageComponent);
+    if (enquedSize == 0) {
+      queue.resume();
+      play(videoMessageComponent);
+    }
   };
 
   const showPlaying = (message: IVideoMessageComponent["message"]) => {
-    if (!music_queue.has(message.guildId)) {
+    if (!music_queue.has(message.guildId))
       return message.channel.send("Nothing playing");
-    }
+
     const queue = music_queue.get(message.guildId);
+
+    if (queue.isEmpty()) return message.channel.send("Nothing playing");
+
     const iterator = queue.iterator();
-    let messageString = "";
+
+    let messageString = "Queue - \n";
     for (let it of iterator) {
-      messageString += it.options.videoId;
+      messageString += it.options.title + "\n";
     }
     message.channel.send(messageString);
   };
 
-  const select = async (messageContent: string, message: Message) => {
-    function isValidHttpUrl(string) {
-      let url;
+  const select = async (messagePayload: string, message: Message) => {
+    if (isValidHttpUrl(messagePayload)) {
+      const videoId = getVideoIdFromURL(messagePayload);
+      const videoInfo = await getVideo(videoId);
 
-      try {
-        url = new URL(string);
-      } catch (_) {
-        return false;
-      }
-
-      return url.protocol === "http:" || url.protocol === "https:";
-    }
-
-    if (isValidHttpUrl(messageContent)) {
-      const videoId = getVideoIdFromURL(messageContent);
-      console.log(videoId);
       return enqueue({
-        youtube_url: messageContent,
+        youtube_url: messagePayload,
         message,
-        options: { videoId },
+        options: { videoId, title: videoInfo.title },
       });
     }
 
-    const suggestions = await searchVideos(messageContent);
-
-    const formatVideoSuggestion = (
-      suggestion: IVideoSuggestion,
-      index: number
-    ) => {
-      function truncate(source: string, size: number) {
-        return source.length > size ? source.slice(0, size - 1) + "…" : source;
-      }
-
-      return `${index + 1}. ${truncate(suggestion.title, 50)} 🎵 (${
-        suggestion.duration.hours > 0 ? suggestion.duration.hours + ":" : ""
-      }${
-        suggestion.duration.minutes > 9
-          ? suggestion.duration.minutes
-          : "0" + suggestion.duration.minutes
-      }:${
-        suggestion.duration.seconds > 9
-          ? suggestion.duration.seconds
-          : "0" + suggestion.duration.seconds
-      }) 🎵 ${suggestion.videoId}`;
-    };
+    const suggestions = await searchVideos(messagePayload);
 
     let formattedText = "";
     suggestions.map((suggestion, index) => {
       formattedText += `${formatVideoSuggestion(suggestion, index)}` + "\n";
     });
+
+    if (!formattedText) return;
+
     const sentMessage = await message.reply(escapeSpoiler(formattedText));
     await Promise.all([
       sentMessage.react(Levels.ONE),
@@ -238,21 +221,22 @@ const main = async () => {
       reaction,
       user
     ) =>
-      reaction.emoji.name == Levels.ONE ||
-      reaction.emoji.name == Levels.TWO ||
-      reaction.emoji.name == Levels.THREE ||
-      reaction.emoji.name == Levels.FOUR ||
-      reaction.emoji.name == Levels.FIVE ||
-      reaction.emoji.name == Levels.EASTER_EGG;
+      // compares user reacting to original message sent by user with the reaction
+      user.id == message.author.id &&
+      (reaction.emoji.name == Levels.ONE ||
+        reaction.emoji.name == Levels.TWO ||
+        reaction.emoji.name == Levels.THREE ||
+        reaction.emoji.name == Levels.FOUR ||
+        reaction.emoji.name == Levels.FIVE ||
+        reaction.emoji.name == Levels.EASTER_EGG);
 
     try {
       const collected = await sentMessage.awaitReactions({
         filter: collectorFilter,
         max: 1,
-        // time: 30_000, //10 secs,
         errors: ["time"],
-        idle: 30_000,
         maxEmojis: 1,
+        maxUsers: 1,
       });
       const content = collected.first().message.content.split("\n");
       let selectedIndex;
@@ -293,7 +277,7 @@ const main = async () => {
         options: { videoId, title },
       });
     } catch (error) {
-      sentMessage.reply("No reaction after 30 seconds, operation canceled.");
+      sentMessage.reply("An unexpected error occured.");
     } finally {
       sentMessage.reactions.removeAll();
     }
@@ -326,7 +310,3 @@ const main = async () => {
 };
 
 main();
-
-// (async () => {
-//   console.log(await searchVideos("Play Date"));
-// })();

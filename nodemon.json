@@ -3,7 +3,7 @@
       "src",
       ".env"
     ],
-    "ext": "js,ts",
+    "ext": "js,ts,json",
     "ignore": [
       "src/**/*.spec.ts"
     ],

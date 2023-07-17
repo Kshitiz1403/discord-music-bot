@@ -1,11 +1,22 @@
 export const getVideoURL = (videoId: string) => {
   return encodeURI(`https://www.youtube.com/watch?v=${videoId}`);
 };
-const isYTMusic = (url: string) => {
-  if (url.includes("music.youtube.com")) {
-    const YTstring = url.replace("music.", "");
-    url = YTstring;
+
+export const isValidHttpUrl = (string: string) => {
+  let url;
+
+  try {
+    url = new URL(string);
+  } catch (_) {
+    return false;
   }
+
+  return url.protocol === "http:" || url.protocol === "https:";
+};
+
+const isYTMusic = (url: string) => {
+  url = url.replace("music.youtube.com", "youtube.com");
+
   let idx = url.indexOf("&list");
   if (idx != -1) {
     const sub = url.substring(0, idx);
