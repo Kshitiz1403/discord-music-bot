@@ -1,0 +1,11 @@
+{
+    "watch": [
+      "src",
+      ".env"
+    ],
+    "ext": "js,ts",
+    "ignore": [
+      "src/**/*.spec.ts"
+    ],
+    "exec": "ts-node ./src/app.ts"
+  }
