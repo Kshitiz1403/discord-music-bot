@@ -1,7 +1,7 @@
 import axios from "axios";
 import { getVideoURL } from "./urlUtils";
 import { IVideoSuggestion } from "../../interfaces/IVideoSuggestion";
-import { getYT_API_Key, rotateKey, totalKeys } from "../../yt_api_service";
+import { getYT_API_Key, rotateKey, totalKeys } from "./yt_api_service";
 
 function YTDurationToSeconds(duration: string) {
   let match: any = duration.match(/PT(\d+H)?(\d+M)?(\d+S)?/);

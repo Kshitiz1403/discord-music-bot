@@ -6,7 +6,7 @@ import config from "../config";
 import { Client, Events, GatewayIntentBits } from "discord.js";
 import { shouldBotTrigger, getMessageContent } from "./utils/botMessage";
 import COMMANDS from "./enums/commands";
-import { loadYT_API_Key } from "./yt_api_service";
+import { loadYT_API_Key } from "./utils/youtube/yt_api_service";
 import select from "./actions/select";
 import pause from "./actions/player/pause";
 import resume from "./actions/player/resume";
