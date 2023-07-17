@@ -4,7 +4,7 @@ enum Levels {
   THREE = "3️⃣",
   FOUR = "4️⃣",
   FIVE = "5️⃣",
-  EASTER_EGG = "🔥"
+  EASTER_EGG = "🥚"
 }
 
 export default Levels;
