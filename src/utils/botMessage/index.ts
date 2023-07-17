@@ -1,4 +1,4 @@
-import getMessagePayload from "./getMessagePayload";
+import getMessageContent from "./getMessageContent";
 import shouldBotTrigger from "./shouldBotTrigger";
 
-export  { getMessagePayload, shouldBotTrigger };
+export { getMessageContent, shouldBotTrigger };

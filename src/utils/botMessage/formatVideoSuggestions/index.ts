@@ -1,6 +1,6 @@
 import { IVideoSuggestion } from "../../../interfaces/IVideoSuggestion";
 
-const formatVideoSuggestion = (suggestion: IVideoSuggestion, index: number) => {
+const formatVideoSuggestions = (suggestion: IVideoSuggestion, index: number) => {
   function truncate(source: string, size: number) {
     return source.length > size ? source.slice(0, size - 1) + "…" : source;
   }
@@ -18,4 +18,4 @@ const formatVideoSuggestion = (suggestion: IVideoSuggestion, index: number) => {
   }) 🎵 ${suggestion.videoId}`;
 };
 
-export default formatVideoSuggestion;
+export default formatVideoSuggestions;
