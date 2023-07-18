@@ -37,17 +37,18 @@ const getVideoHelper = async (videoId: string) => {
 };
 
 const searchVideosHelper = async (search_term: string) => {
+  const LIMIT = 5;
   const allVideos = await (
     await axios.get(`https://www.googleapis.com/youtube/v3/search`, {
       params: {
         part: "snippet",
-        maxResults: 5,
+        maxResults: LIMIT,
         q: search_term,
         type: "video",
         key: getYT_API_Key(),
       },
     })
-  ).data.items;
+  ).data.items.slice(0, LIMIT);
 
   let videoInfoPromises = [];
   const videosRaw = allVideos.map((video) => {

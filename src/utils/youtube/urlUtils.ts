@@ -17,13 +17,15 @@ export const isValidHttpUrl = (string: string) => {
 const isYTMusic = (url: string) => {
   url = url.replace("music.youtube.com", "youtube.com");
 
-  let idx = url.indexOf("&list");
-  if (idx != -1) {
-    const sub = url.substring(0, idx);
-    return sub;
+  const listIndex = url.indexOf("&list");
+  if (listIndex != -1) {
+    const everythingBeforeList = url.substring(0, listIndex);
+    return everythingBeforeList;
   }
   return url;
 };
+
+// https://stackoverflow.com/questions/3452546/how-do-i-get-the-youtube-video-id-from-a-url
 export const getVideoIdFromURL = (url: string) => {
   url = isYTMusic(url);
   var regExp =

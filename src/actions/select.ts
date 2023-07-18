@@ -8,11 +8,7 @@ import {
   escapeSpoiler,
 } from "discord.js";
 import Levels from "../enums/levels";
-import {
-  getVideoIdFromURL,
-  getVideoURL,
-  isValidHttpUrl,
-} from "../utils/youtube/urlUtils";
+import { getVideoIdFromURL, isValidHttpUrl } from "../utils/youtube/urlUtils";
 import { getVideo, searchVideos } from "../utils/youtube/videoService";
 import formatVideoSuggestions from "../utils/botMessage/formatters/formatVideoSuggestions";
 import enqueue from "./queue/enque";
