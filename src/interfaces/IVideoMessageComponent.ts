@@ -6,7 +6,7 @@ export interface IVideoMessageComponent {
   options: {
     videoId: string;
     title: string;
+    duration: string;
     description?: string;
-    duration?: string;
   };
 }

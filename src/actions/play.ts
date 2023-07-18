@@ -27,6 +27,10 @@ const play = async (videoMessageComponent: IVideoMessageComponent) => {
     return;
   }
 
+  const waitingMessage = await message.channel.send(
+    bold(codeBlock("Thinking..."))
+  );
+
   const connection = joinVoiceChannel({
     guildId: guildId.toString(),
     channelId: voiceChannel.toString(),
@@ -57,6 +61,8 @@ const play = async (videoMessageComponent: IVideoMessageComponent) => {
   const resource = createAudioResource(outputPath);
 
   player.play(resource);
+
+  await waitingMessage.delete();
 
   message.channel.send(
     bold(
