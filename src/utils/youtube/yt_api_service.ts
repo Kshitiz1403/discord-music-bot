@@ -29,16 +29,15 @@ export const getYT_API_Key = () => {
 };
 
 export const rotateKey = () => {
-  const totalKeys = config.youtube_api_keys.length;
-  const nextIndex = (KEY_INDEX + 1) % totalKeys;
+  const nextIndex = (KEY_INDEX + 1) % totalKeys();
   KEY_INDEX = nextIndex;
   saveKey();
   setKey();
 };
 
-export const totalKeys = () => {
+export function totalKeys() {
   return config.youtube_api_keys.length;
-};
+}
 
 function saveKey() {
   fs.writeFileSync(FILE_PATH, KEY_INDEX.toString());

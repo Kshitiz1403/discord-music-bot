@@ -7,12 +7,12 @@ import {
   getVoiceConnection,
   joinVoiceChannel,
 } from "@discordjs/voice";
-import { IVideoMessageComponent } from "../interfaces/IVideoMessageComponent";
+import { bold, codeBlock } from "discord.js";
 import youtubeDl from "youtube-dl-exec";
+import { IVideoMessageComponent } from "../interfaces/IVideoMessageComponent";
 import playerStatusEmitter from "../events/audioPlayer";
 import deque from "./queue/deque";
 import { formatDuration, truncate } from "../utils/botMessage/formatters";
-import { bold, codeBlock } from "discord.js";
 import logger from "../loaders/logger";
 
 const play = async (videoMessageComponent: IVideoMessageComponent) => {
@@ -27,8 +27,8 @@ const play = async (videoMessageComponent: IVideoMessageComponent) => {
     return;
   }
 
-  const waitingMessage = await message.channel.send(
-    bold(codeBlock("Thinking..."))
+  const acknowledgementMessage = await message.channel.send(
+    bold(codeBlock("Processing..."))
   );
 
   const connection = joinVoiceChannel({
@@ -62,9 +62,7 @@ const play = async (videoMessageComponent: IVideoMessageComponent) => {
 
   player.play(resource);
 
-  await waitingMessage.delete();
-
-  message.channel.send(
+  acknowledgementMessage.edit(
     bold(
       codeBlock(
         `🔊 Now Playing: ${truncate(options.title, 50)} ${formatDuration(
