@@ -3,7 +3,7 @@ dotenv.config();
 import path from "path";
 global.appRoot = path.resolve(__dirname, "..");
 import config from "../config";
-import { Client, Events, GatewayIntentBits } from "discord.js";
+import { ActivityType, Client, Events, GatewayIntentBits } from "discord.js";
 import { shouldBotTrigger, getMessageContent } from "./utils/botMessage";
 import COMMANDS from "./enums/commands";
 import { loadYT_API_Key } from "./utils/youtube/yt_api_service";
@@ -35,6 +35,8 @@ const main = async () => {
 
     console.log(`Ready! Logged in as ${c.user.tag}`);
   });
+
+  client.user.setActivity({ type: ActivityType.Listening, name: "8====D" });
 
   client.on(Events.MessageCreate, async (message) => {
     const content = message.content;
