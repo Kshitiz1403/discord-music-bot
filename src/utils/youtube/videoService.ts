@@ -2,13 +2,14 @@ import axios from "axios";
 import { getVideoURL } from "./urlUtils";
 import { IVideoSuggestion } from "../../interfaces/IVideoSuggestion";
 import { getYT_API_Key, rotateKey, totalKeys } from "./yt_api_service";
+import logger from "../../loaders/logger";
 
 const retryableFunction = async (fn, n: number, ...args) => {
   try {
     return await fn(...args);
   } catch (error) {
     if (n == 1) throw error;
-    console.log("Retrying Function Call");
+    logger.debug("Retrying Function Call");
     const status = error?.response?.status;
     if (status == 403) {
       rotateKey();

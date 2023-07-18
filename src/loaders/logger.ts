@@ -1,0 +1,45 @@
+import winston from "winston";
+import config from "../../config";
+
+const transports = [];
+
+if (config.node_env !== "development") {
+  transports.push(
+    new winston.transports.Console({
+      format: winston.format.combine(
+        winston.format.cli(),
+        winston.format.splat()
+      ),
+    })
+  );
+  transports.push(
+    new winston.transports.File({ filename: "error.log", level: "error" }),
+    new winston.transports.File({ filename: "warn.log", level: "warn" }),
+    new winston.transports.File({ filename: "combined.log" })
+  );
+} else {
+  transports.push(
+    new winston.transports.Console({
+      format: winston.format.combine(
+        winston.format.cli(),
+        winston.format.splat()
+      ),
+    })
+  );
+}
+
+const logger = winston.createLogger({
+  level: "silly",
+  levels: winston.config.npm.levels,
+  format: winston.format.combine(
+    winston.format.timestamp({
+      format: "YYYY-MM-DD HH:mm:ss",
+    }),
+    winston.format.errors({ stack: true }),
+    winston.format.splat(),
+    winston.format.json()
+  ),
+  transports,
+});
+
+export default logger;

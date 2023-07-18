@@ -13,6 +13,7 @@ import resume from "./actions/player/resume";
 import skip from "./actions/player/skip";
 import showPlaying from "./actions/player/showPlaying";
 import help from "./actions/help";
+import logger from "./loaders/logger";
 
 loadYT_API_Key();
 
@@ -28,12 +29,22 @@ const main = async () => {
     ],
   });
 
-  await client.login(config.token);
+  logger.silly("🔃 Logging in...");
+
+  try {
+    await client.login(config.discord_bot_token);
+  } catch (error) {
+    logger.error(`🔥 ${error}`);
+  }
 
   client.once(Events.ClientReady, (c) => {
-    console.log(`Bot is online!`);
+    logger.info(`
+    ########################################
+              ✌ Bot is online!
 
-    console.log(`Ready! Logged in as ${c.user.tag}`);
+      ✌ Ready! Logged in as ${c.user.tag}
+    ########################################
+    `);
   });
 
   client.user.setActivity({ type: ActivityType.Listening, name: "8====D" });

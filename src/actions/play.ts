@@ -13,6 +13,7 @@ import playerStatusEmitter from "../events/audioPlayer";
 import deque from "./queue/deque";
 import { formatDuration, truncate } from "../utils/botMessage/formatters";
 import { bold, codeBlock } from "discord.js";
+import logger from "../loaders/logger";
 
 const play = async (videoMessageComponent: IVideoMessageComponent) => {
   const { message, options, youtube_url } = videoMessageComponent;
@@ -77,7 +78,8 @@ const play = async (videoMessageComponent: IVideoMessageComponent) => {
     if (newOne.status == AudioPlayerStatus.Idle) {
       // Song finished
       setTimeout(() => {
-        fs.unlink(outputPath, (err) => err && console.error(err));
+        logger.silly(`Deleting file ${outputPath}`);
+        fs.unlink(outputPath, (err) => err && logger.error(`🔥 ${err}`));
       }, 2000);
       deque(message);
       return;
