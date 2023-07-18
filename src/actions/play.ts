@@ -22,7 +22,7 @@ const play = async (videoMessageComponent: IVideoMessageComponent) => {
   const guildId = message.member.guild.id;
 
   if (!voiceChannel) {
-    message.channel.send("VC join karni padegi");
+    message.channel.send(bold(codeBlock("⚠️ Please join a voice channel.")));
     deque(message);
     return;
   }
