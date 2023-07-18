@@ -5,7 +5,8 @@
   "author": "Kshitiz <kshitizagrawal@outlook.com>",
   "license": "MIT",
   "scripts": {
-    "start": "nodemon",
+    "dev": "nodemon",
+    "start": "ts-node ./src/app.ts",
     "test": "vitest --globals"
   },
   "dependencies": {
