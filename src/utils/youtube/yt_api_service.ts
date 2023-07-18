@@ -16,6 +16,7 @@ export const loadYT_API_Key = () => {
   if (!fs.existsSync(FILE_PATH)) {
     KEY_INDEX = 0;
     saveKey();
+    setKey();
     return;
   }
   KEY_INDEX = parseInt(fs.readFileSync(FILE_PATH, { encoding: "utf8" }));
