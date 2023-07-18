@@ -22,6 +22,7 @@ const play = async (videoMessageComponent: IVideoMessageComponent) => {
 
   if (!voiceChannel) {
     message.channel.send("VC join karni padegi");
+    deque(message);
     return;
   }
 
