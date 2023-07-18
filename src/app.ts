@@ -12,6 +12,7 @@ import pause from "./actions/player/pause";
 import resume from "./actions/player/resume";
 import skip from "./actions/player/skip";
 import showPlaying from "./actions/player/showPlaying";
+import help from "./actions/help";
 
 loadYT_API_Key();
 
@@ -56,6 +57,9 @@ const main = async () => {
         break;
       case COMMANDS.QUEUE.toLowerCase():
         showPlaying(message);
+        break;
+      case COMMANDS.HELP.toLowerCase():
+        help(message);
         break;
     }
   });

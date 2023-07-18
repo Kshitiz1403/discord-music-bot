@@ -4,6 +4,7 @@ enum COMMANDS {
   RESUME = "RESUME",
   SKIP = "SKIP",
   QUEUE = "QUEUE",
+  HELP = "HELP",
 }
 
 export default COMMANDS;
