@@ -11,6 +11,8 @@ import { IVideoMessageComponent } from "../interfaces/IVideoMessageComponent";
 import youtubeDl from "youtube-dl-exec";
 import playerStatusEmitter from "../events/audioPlayer";
 import deque from "./queue/deque";
+import { formatDuration, truncate } from "../utils/botMessage/formatters";
+import { bold, codeBlock } from "discord.js";
 
 const play = async (videoMessageComponent: IVideoMessageComponent) => {
   const { message, options, youtube_url } = videoMessageComponent;
@@ -54,14 +56,28 @@ const play = async (videoMessageComponent: IVideoMessageComponent) => {
 
   player.play(resource);
 
+  message.channel.send(
+    bold(
+      codeBlock(
+        `🔊 Now Playing: ${truncate(options.title, 50)} ${formatDuration(
+          options.duration
+        )}`
+      )
+    )
+  );
+
   playerStatusEmitter.on("pause", () => player.pause());
 
   playerStatusEmitter.on("resume", () => player.unpause());
 
+  playerStatusEmitter.on("stop", () => player.stop());
+
   player.on("stateChange", (oldOne, newOne) => {
     if (newOne.status == AudioPlayerStatus.Idle) {
       // Song finished
-      fs.unlink(outputPath, (err) => err && console.error(err));
+      setTimeout(() => {
+        fs.unlink(outputPath, (err) => err && console.error(err));
+      }, 2000);
       deque(message);
       return;
     }

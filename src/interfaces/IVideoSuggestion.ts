@@ -1,11 +1,6 @@
 export interface IVideoSuggestion {
   videoId: string;
-  duration: {
-    hours: number;
-    minutes: number;
-    seconds: number;
-    duration: number;
-  };
+  duration: string;
   url: string;
   title: string;
 }

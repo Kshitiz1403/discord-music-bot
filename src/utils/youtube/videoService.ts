@@ -3,27 +3,6 @@ import { getVideoURL } from "./urlUtils";
 import { IVideoSuggestion } from "../../interfaces/IVideoSuggestion";
 import { getYT_API_Key, rotateKey, totalKeys } from "./yt_api_service";
 
-function YTDurationToSeconds(duration: string) {
-  let match: any = duration.match(/PT(\d+H)?(\d+M)?(\d+S)?/);
-
-  match = match.slice(1).map(function (x: string) {
-    if (x != null) {
-      return x.replace(/\D/, "");
-    }
-  });
-
-  let hours = parseInt(match[0]) || 0;
-  let minutes = parseInt(match[1]) || 0;
-  let seconds = parseInt(match[2]) || 0;
-
-  return {
-    hours,
-    minutes,
-    seconds,
-    duration: hours * 3600 + minutes * 60 + seconds,
-  };
-}
-
 const retryableFunction = async (fn, n: number, ...args) => {
   try {
     return await fn(...args);
@@ -91,7 +70,6 @@ const searchVideosHelper = async (search_term: string) => {
     const videoInfo = videoInfos[idx];
 
     let { duration } = videoInfo;
-    duration = YTDurationToSeconds(duration);
 
     return {
       videoId: video.videoId,

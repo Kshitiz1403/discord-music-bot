@@ -3,6 +3,8 @@ import {
   Message,
   MessageReaction,
   User,
+  bold,
+  codeBlock,
   escapeSpoiler,
 } from "discord.js";
 import Levels from "../enums/levels";
@@ -12,8 +14,9 @@ import {
   isValidHttpUrl,
 } from "../utils/youtube/urlUtils";
 import { getVideo, searchVideos } from "../utils/youtube/videoService";
-import formatVideoSuggestions from "../utils/botMessage/formatVideoSuggestions";
+import formatVideoSuggestions from "../utils/botMessage/formatters/formatVideoSuggestions";
 import enqueue from "./queue/enque";
+import selections from "../store/selections";
 
 const select = async (messagePayload: string, message: Message) => {
   if (isValidHttpUrl(messagePayload)) {
@@ -23,20 +26,30 @@ const select = async (messagePayload: string, message: Message) => {
     return enqueue({
       youtube_url: messagePayload,
       message,
-      options: { videoId, title: videoInfo.title },
+      options: {
+        videoId,
+        title: videoInfo.title,
+        duration: videoInfo.duration,
+        description: videoInfo.description,
+      },
     });
   }
 
   const suggestions = await searchVideos(messagePayload);
 
-  let formattedText = "";
+  let formattedText = "🤔Selections\n\n";
   suggestions.map((suggestion, index) => {
     formattedText += `${formatVideoSuggestions(suggestion, index)}` + "\n";
   });
 
   if (!formattedText) return;
 
-  const sentMessage = await message.reply(escapeSpoiler(formattedText));
+  const sentMessage = await message.reply(
+    bold(codeBlock(escapeSpoiler(formattedText)))
+  );
+
+  selections.set(sentMessage.id, suggestions);
+
   await Promise.all([
     sentMessage.react(Levels.ONE),
     sentMessage.react(Levels.TWO),
@@ -67,8 +80,8 @@ const select = async (messagePayload: string, message: Message) => {
       maxEmojis: 1,
       maxUsers: 1,
     });
-    const content = collected.first().message.content.split("\n");
-    let selectedIndex;
+
+    let selectedIndex: number;
 
     switch (collected.first().emoji.name) {
       case Levels.ONE:
@@ -91,19 +104,18 @@ const select = async (messagePayload: string, message: Message) => {
       default:
         sentMessage.reply("Error");
     }
-    const selectedContent = content[selectedIndex];
 
-    const title = selectedContent.substring(
-      selectedContent.indexOf(".") + 1,
-      selectedContent.indexOf("🎵")
-    );
-    const splits = selectedContent.split("🎵 ");
-    const videoId = splits[splits.length - 1];
+    const all_options = selections.get(sentMessage.id);
+    const selected_option = all_options[selectedIndex];
 
     return enqueue({
-      youtube_url: getVideoURL(videoId),
+      youtube_url: selected_option.url,
       message: message,
-      options: { videoId, title },
+      options: {
+        videoId: selected_option.videoId,
+        title: selected_option.title,
+        duration: selected_option.duration,
+      },
     });
   } catch (error) {
     sentMessage.reply("An unexpected error occured.");

@@ -35,7 +35,7 @@ const main = async () => {
     console.log(`Ready! Logged in as ${c.user.tag}`);
   });
 
-  client.on("messageCreate", async (message) => {
+  client.on(Events.MessageCreate, async (message) => {
     const content = message.content;
     if (!shouldBotTrigger(content)) return;
 
