@@ -7,6 +7,7 @@ export function isPlaylist(e: Queue | IVideoComponent): e is Queue {
   return (<Queue>e).type == "PLAYLIST";
 }
 
+
 export function isVideo(
   e: Queue | IVideoComponent
 ): e is IVideoComponent {
@@ -15,11 +16,11 @@ export function isVideo(
 
 class Queue {
   // Index, (Video | Playlist)
-  private items: Map<number, IVideoComponent | Queue>;
-  private headIndex: number;
-  private tailIndex: number;
-  private _isPlaying: boolean;
-  readonly type: "PLAYLIST" | "VIDEO";
+   items: Map<number, IVideoComponent | Queue>;
+   headIndex: number;
+   tailIndex: number;
+   _isPlaying: boolean;
+   type: "PLAYLIST" | "VIDEO";
   constructor(type: "PLAYLIST" | "VIDEO" = "VIDEO") {
     this.items = new Map<number, IVideoComponent | Queue>();
     this.headIndex = 0;
@@ -70,7 +71,7 @@ class Queue {
 
   //checks if queue is empty or not
   isEmpty() {
-    return this.tailIndex - this.headIndex <= 0;
+    return this.tailIndex - this.headIndex == 0;
   }
 
   //pause the player

@@ -4,37 +4,7 @@ import { IQueueComponent } from "../../interfaces/IQueueComponent";
 import music_queue from "../../store/music_queue";
 import play from "../play";
 import { bold, codeBlock } from "discord.js";
-import { PlayerEvents } from "../../enums/events";
-import Queue, { isPlaylist, isVideo } from "../../utils/Queue";
-
-const dequeueCore = (
-  queue: Queue,
-  mainQueue: Queue,
-  message: IQueueComponent["message"]
-) => {
-  if (queue.isEmpty()) return;
-
-  queue.dequeue();
-  if (isPlaylist(queue) && queue.isEmpty()) mainQueue.dequeue();
-
-  if (mainQueue.isEmpty()) {
-    // when called from "skip", the queue if "now empty", must explicitly ask the player to stop.
-    playerStatusEmitter.emit(PlayerEvents.STOP);
-    if (message.client.voice.adapters.size > 0) {
-      message.channel.send(
-        bold(codeBlock("No tracks to play, leaving the VC..."))
-      );
-      getVoiceConnection(message.guildId).disconnect();
-    }
-    return;
-  }
-  if (!mainQueue.isPlaying()) return;
-
-  const peek = queue.peek();
-
-  // Unnecessary check for the typescript compiler.
-  if (isVideo(peek)) play(peek);
-};
+import { isPlaylist, isVideo } from "../../utils/Queue";
 
 const deque = (
   message: IQueueComponent["message"],
@@ -43,36 +13,72 @@ const deque = (
   const { guildId } = message;
   const mainQueue = music_queue.get(guildId);
 
-  if (mainQueue.isEmpty()) return;
+  const nothingToPlay = () => {
+    playerStatusEmitter.emit("stop");
+    if (message.client.voice.adapters.size > 0) {
+      message.channel.send(
+        bold(codeBlock("No tracks to play."))
+      );
+      getVoiceConnection(message.guildId).disconnect();
+    }
+    return;
+  };
 
-  // Check if the peek element is a playlist or not, if not, go ahead, else check-in into the playlist, then proceed.
-
-  const playlist = mainQueue.peek();
-
-  if (dequeueCompletePlaylist && !isPlaylist(playlist))
-    return message.channel.send(
-      bold(
-        codeBlock(
-          `A song from playlist is not being played, hence not skipped. Use "skip" instead`
+  if (dequeueCompletePlaylist) {
+    if (mainQueue.isEmpty()) return nothingToPlay();
+    const firstInQueue = mainQueue.peek();
+    if (!isPlaylist(firstInQueue))
+      return message.channel.send(
+        bold(
+          codeBlock(
+            `A song from playlist is not being played, hence not skipped. Use "skip" instead`
+          )
         )
-      )
-    );
+      );
+    mainQueue.dequeue();
+    if (mainQueue.isEmpty()) return nothingToPlay();
 
-  if (dequeueCompletePlaylist && isPlaylist(playlist)) {
-    return dequeueCore(mainQueue, mainQueue, message);
+    const nextItem = mainQueue.peek();
+    if (isVideo(nextItem)) return play(nextItem);
+
+    const firstElement = nextItem.peek();
+    if (isVideo(firstElement)) return play(firstElement);
+    return;
   }
 
-  //Two cases
+  //🥺Sorry for writing this code :(
+  if (mainQueue.isEmpty()) return nothingToPlay();
 
-  // if current song is part a playlist
-  if (isPlaylist(playlist)) {
-    // check-in into the playlist,
-    return dequeueCore(playlist, mainQueue, message);
+  let typeOfItem = mainQueue.peek();
+  if (isPlaylist(typeOfItem)) {
+    const playlist = typeOfItem;
+    playlist.dequeue();
+    if (!playlist.isEmpty()) {
+      const v = playlist.peek();
+      if (isVideo(v)) return play(v);
+    }
+    mainQueue.dequeue();
+    if (mainQueue.isEmpty()) return nothingToPlay();
+
+    const peekedMainQueue = mainQueue.peek();
+    if (isVideo(peekedMainQueue)) return play(peekedMainQueue);
+
+    const innerPlaylist = peekedMainQueue;
+    if (innerPlaylist.isEmpty()) return nothingToPlay();
+
+    const peekInnerPlaylist = innerPlaylist.peek();
+    if (isVideo(peekInnerPlaylist)) return play(peekInnerPlaylist);
+    return;
   }
+  mainQueue.dequeue();
+  if (mainQueue.isEmpty()) return nothingToPlay();
+  const next = mainQueue.peek();
+  if (isVideo(next)) return play(next);
 
-  // If current song is not part of playlist
-
-  dequeueCore(mainQueue, mainQueue, message);
+  const playlist = next;
+  if (playlist.isEmpty()) return nothingToPlay();
+  const playlistPeek = playlist.peek();
+  if (isVideo(playlistPeek)) return play(playlistPeek);
 };
 
 export default deque;

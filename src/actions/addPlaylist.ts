@@ -17,18 +17,16 @@ const addPlaylist = async (messageContent: string, message: Message) => {
   enqueue({
     message,
     type: "PLAYLIST",
-    videos: videos.items.map((video) => {
-      return {
-        youtube_url: video.youtube_url,
-        message,
-        options: {
-          videoId: video.videoId,
-          duration: video.duration,
-          title: video.title,
-          description: video.description,
-        },
-      };
-    }),
+    videos: videos.items.map((video) => ({
+      youtube_url: video.youtube_url,
+      message,
+      options: {
+        videoId: video.videoId,
+        duration: video.duration,
+        title: video.title,
+        description: video.description,
+      },
+    })),
   });
 };
 

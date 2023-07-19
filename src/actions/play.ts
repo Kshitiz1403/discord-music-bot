@@ -16,6 +16,7 @@ import deque from "./queue/deque";
 import { formatDuration, truncate } from "../utils/botMessage/formatters";
 import logger from "../loaders/logger";
 import { PlayerEvents } from "../enums/events";
+import forceStop from "./player/forceStop";
 
 const play = async (videoComponent: IVideoComponent) => {
   const { message, options, youtube_url } = videoComponent;
@@ -25,7 +26,7 @@ const play = async (videoComponent: IVideoComponent) => {
 
   if (!voiceChannel) {
     message.channel.send(bold(codeBlock("⚠️ Please join a voice channel.")));
-    deque(message);
+    forceStop(message);
     return;
   }
 
@@ -73,6 +74,8 @@ const play = async (videoComponent: IVideoComponent) => {
       )
     )
   );
+
+  connection.on(VoiceConnectionStatus.Disconnected, () => forceStop(message));
 
   playerStatusEmitter.on(
     PlayerEvents.FORCE_STOP,
