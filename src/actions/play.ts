@@ -2,6 +2,7 @@ import path from "path";
 import fs from "fs";
 import {
   AudioPlayerStatus,
+  VoiceConnectionStatus,
   createAudioPlayer,
   createAudioResource,
   getVoiceConnection,
@@ -9,14 +10,15 @@ import {
 } from "@discordjs/voice";
 import { bold, codeBlock } from "discord.js";
 import youtubeDl from "youtube-dl-exec";
-import { IVideoMessageComponent } from "../interfaces/IVideoMessageComponent";
+import { IVideoComponent } from "../interfaces/IQueueComponent";
 import playerStatusEmitter from "../events/audioPlayer";
 import deque from "./queue/deque";
 import { formatDuration, truncate } from "../utils/botMessage/formatters";
 import logger from "../loaders/logger";
+import { PlayerEvents } from "../enums/events";
 
-const play = async (videoMessageComponent: IVideoMessageComponent) => {
-  const { message, options, youtube_url } = videoMessageComponent;
+const play = async (videoComponent: IVideoComponent) => {
+  const { message, options, youtube_url } = videoComponent;
 
   const voiceChannel = message.member.voice?.channelId;
   const guildId = message.member.guild.id;
@@ -72,11 +74,18 @@ const play = async (videoMessageComponent: IVideoMessageComponent) => {
     )
   );
 
-  playerStatusEmitter.on("pause", () => player.pause());
+  playerStatusEmitter.on(
+    PlayerEvents.FORCE_STOP,
+    () =>
+      connection.state.status != VoiceConnectionStatus.Destroyed &&
+      connection.destroy()
+  );
 
-  playerStatusEmitter.on("resume", () => player.unpause());
+  playerStatusEmitter.on(PlayerEvents.PAUSE, () => player.pause());
 
-  playerStatusEmitter.on("stop", () => player.stop());
+  playerStatusEmitter.on(PlayerEvents.RESUME, () => player.unpause());
+
+  playerStatusEmitter.on(PlayerEvents.STOP, () => player.stop());
 
   player.on("stateChange", (oldOne, newOne) => {
     if (newOne.status == AudioPlayerStatus.Idle) {

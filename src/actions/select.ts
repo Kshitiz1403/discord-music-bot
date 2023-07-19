@@ -20,13 +20,17 @@ const select = async (messagePayload: string, message: Message) => {
     const videoInfo = await getVideo(videoId);
 
     return enqueue({
-      youtube_url: messagePayload,
       message,
-      options: {
-        videoId,
-        title: videoInfo.title,
-        duration: videoInfo.duration,
-        description: videoInfo.description,
+      type: "VIDEO",
+      video: {
+        youtube_url: messagePayload,
+        message,
+        options: {
+          videoId,
+          title: videoInfo.title,
+          duration: videoInfo.duration,
+          description: videoInfo.description,
+        },
       },
     });
   }
@@ -105,12 +109,16 @@ const select = async (messagePayload: string, message: Message) => {
     const selected_option = all_options[selectedIndex];
 
     return enqueue({
-      youtube_url: selected_option.url,
       message: message,
-      options: {
-        videoId: selected_option.videoId,
-        title: selected_option.title,
-        duration: selected_option.duration,
+      type: "VIDEO",
+      video: {
+        youtube_url: selected_option.url,
+        message,
+        options: {
+          videoId: selected_option.videoId,
+          title: selected_option.title,
+          duration: selected_option.duration,
+        },
       },
     });
   } catch (error) {

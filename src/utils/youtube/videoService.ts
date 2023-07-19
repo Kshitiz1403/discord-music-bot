@@ -18,7 +18,55 @@ const retryableFunction = async (fn, n: number, ...args) => {
   return await retryableFunction(fn, n - 1, args);
 };
 
-const getVideoHelper = async (videoId: string) => {
+async function getPlaylistHelper(playlistId: string) {
+  const info = (
+    await axios.get(
+      " https://youtube.googleapis.com/youtube/v3/playlistItems",
+      {
+        params: {
+          part: "snippet",
+          playlistId: playlistId,
+          key: getYT_API_Key(),
+          maxResults: 50,
+        },
+      }
+    )
+  ).data;
+  const { nextPageToken } = info;
+
+  const detailsPromises: ReturnType<typeof getVideo>[] = [];
+
+  const items: any[] = info.items;
+  const returnItems = items.map((item) => {
+    const { snippet } = item;
+    const {
+      title,
+      description,
+      position,
+    }: { title: string; description: string; position: number } = snippet;
+    const videoId: string = snippet.resourceId.videoId;
+    detailsPromises.push(getVideo(videoId));
+    const youtube_url = getVideoURL(videoId);
+
+    return {
+      title,
+      description,
+      videoId,
+      youtube_url,
+      duration: "",
+      position,
+    };
+  });
+
+  const details = await Promise.all(detailsPromises);
+  returnItems.map((item, idx) => {
+    item.duration = details[idx].duration;
+  });
+
+  return { nextPageToken, items: returnItems };
+}
+
+async function getVideoHelper(videoId: string) {
   const video = (
     await axios.get("https://youtube.googleapis.com/youtube/v3/videos", {
       params: {
@@ -35,9 +83,9 @@ const getVideoHelper = async (videoId: string) => {
     description: video.snippet.description,
     channelTitle: video.snippet.channelTitle,
   };
-};
+}
 
-const searchVideosHelper = async (search_term: string) => {
+async function searchVideosHelper(search_term: string) {
   const LIMIT = 5;
   const allVideos = await (
     await axios.get(`https://www.googleapis.com/youtube/v3/search`, {
@@ -81,7 +129,7 @@ const searchVideosHelper = async (search_term: string) => {
     };
   });
   return videos;
-};
+}
 
 export async function getVideo(
   videoId: string
@@ -93,4 +141,10 @@ export async function searchVideos(
   search_term: string
 ): ReturnType<typeof searchVideosHelper> {
   return retryableFunction(searchVideosHelper, totalKeys(), search_term);
+}
+
+export async function getPlaylist(
+  playlistId: string
+): ReturnType<typeof getPlaylistHelper> {
+  return retryableFunction(getPlaylistHelper, totalKeys(), playlistId);
 }

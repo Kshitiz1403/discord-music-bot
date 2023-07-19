@@ -3,8 +3,11 @@ enum COMMANDS {
   PAUSE = "PAUSE",
   RESUME = "RESUME",
   SKIP = "SKIP",
+  STOP = "STOP",
+  SKIP_PLAYLIST = "SKIPLIST",
   QUEUE = "QUEUE",
   HELP = "HELP",
+  ADD_PLAYLIST = "PLAYLIST",
 }
 
 export default COMMANDS;

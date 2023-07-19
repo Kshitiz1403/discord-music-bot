@@ -14,6 +14,9 @@ import skip from "./actions/player/skip";
 import showPlaying from "./actions/player/showPlaying";
 import help from "./actions/help";
 import logger from "./loaders/logger";
+import addPlaylist from "./actions/addPlaylist";
+import skipPlaylist from "./actions/player/skipPlaylist";
+import forceStop from "./actions/player/forceStop";
 
 loadYT_API_Key();
 
@@ -59,6 +62,9 @@ const main = async () => {
       case COMMANDS.PLAY.toLowerCase():
         select(messageContent, message);
         break;
+      case COMMANDS.ADD_PLAYLIST.toLowerCase():
+        addPlaylist(messageContent, message);
+        break;
       case COMMANDS.PAUSE.toLowerCase():
         pause(message);
         break;
@@ -67,6 +73,12 @@ const main = async () => {
         break;
       case COMMANDS.SKIP.toLowerCase():
         skip(message);
+        break;
+      case COMMANDS.SKIP_PLAYLIST.toLowerCase():
+        skipPlaylist(message);
+        break;
+      case COMMANDS.STOP.toLowerCase():
+        forceStop(message);
         break;
       case COMMANDS.QUEUE.toLowerCase():
         showPlaying(message);

@@ -1,4 +1,4 @@
-import { IVideoMessageComponent } from "../../../interfaces/IVideoMessageComponent";
+import { IVideoComponent } from "../../../interfaces/IQueueComponent";
 
 function YTDurationToSeconds(duration: string) {
   let match: any = duration.match(/PT(\d+H)?(\d+M)?(\d+S)?/);
@@ -22,7 +22,7 @@ function YTDurationToSeconds(duration: string) {
 }
 
 const formatDuration = (
-  duration: IVideoMessageComponent["options"]["duration"]
+  duration: IVideoComponent["options"]["duration"]
 ) => {
   const durationObj = YTDurationToSeconds(duration);
 

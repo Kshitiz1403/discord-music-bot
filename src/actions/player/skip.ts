@@ -1,6 +1,6 @@
-import { IVideoMessageComponent } from "../../interfaces/IVideoMessageComponent";
+import { IQueueComponent } from "../../interfaces/IQueueComponent";
 import deque from "../queue/deque";
 
-const skip = (message: IVideoMessageComponent["message"]) => deque(message);
+const skip = (message: IQueueComponent["message"]) => deque(message);
 
 export default skip;

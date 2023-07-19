@@ -2,6 +2,14 @@ export const getVideoURL = (videoId: string) => {
   return encodeURI(`https://www.youtube.com/watch?v=${videoId}`);
 };
 
+export const getPlaylistId = (youtube_url: string) => {
+  const regex = /[&?]list=([^&]+)/i;
+
+  const match = youtube_url.match(regex);
+  const playlistId = match[1];
+  return playlistId;
+};
+
 export const isValidHttpUrl = (string: string) => {
   let url;
 

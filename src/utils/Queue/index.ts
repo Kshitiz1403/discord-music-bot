@@ -1,23 +1,52 @@
-import { IVideoMessageComponent } from "../../interfaces/IVideoMessageComponent";
+import {
+  IVideoComponent,
+  IQueueComponent,
+} from "../../interfaces/IQueueComponent";
+
+export function isPlaylist(e: Queue | IVideoComponent): e is Queue {
+  return (<Queue>e).type == "PLAYLIST";
+}
+
+export function isVideo(
+  e: Queue | IVideoComponent
+): e is IVideoComponent {
+  return (<IVideoComponent>e).message !== undefined;
+}
 
 class Queue {
-  // Index, VideoMessageComponent
-  items: Map<number, IVideoMessageComponent>;
-  headIndex: number;
-  tailIndex: number;
-  isPlaying: boolean;
-  constructor() {
-    this.items = new Map<number, IVideoMessageComponent>();
+  // Index, (Video | Playlist)
+  private items: Map<number, IVideoComponent | Queue>;
+  private headIndex: number;
+  private tailIndex: number;
+  private _isPlaying: boolean;
+  readonly type: "PLAYLIST" | "VIDEO";
+  constructor(type: "PLAYLIST" | "VIDEO" = "VIDEO") {
+    this.items = new Map<number, IVideoComponent | Queue>();
     this.headIndex = 0;
     this.tailIndex = 0;
-    this.isPlaying = true;
+    this._isPlaying = true;
+    this.type = type;
   }
 
   //adds a new element
-  enqueue(element: IVideoMessageComponent) {
-    this.items.set(this.tailIndex, element);
-    this.tailIndex++;
-    return element;
+  enqueue(element: IQueueComponent) {
+    switch (element.type) {
+      case "VIDEO":
+        this.items.set(this.tailIndex, element.video);
+        this.tailIndex++;
+        return;
+
+      case "PLAYLIST":
+        this.items.set(this.tailIndex, new Queue("PLAYLIST"));
+        const playlist = this.items.get(this.tailIndex);
+        if (isPlaylist(playlist)) {
+          element.videos.map((video) =>
+            playlist.items.set(playlist.tailIndex++, video)
+          );
+        }
+        this.tailIndex++;
+        return;
+    }
   }
 
   //removes an element from head of the queue
@@ -41,17 +70,25 @@ class Queue {
 
   //checks if queue is empty or not
   isEmpty() {
-    return this.tailIndex - this.headIndex == 0;
+    return this.tailIndex - this.headIndex <= 0;
   }
 
   //pause the player
   pause() {
-    this.isPlaying = false;
+    // The pause functionality of the internal queue i.e. the playlist is insignificant.
+    // Different resume/pause states for internal/main queue need not be maintained.
+    this._isPlaying = false;
   }
 
   //resume the player
   resume() {
-    this.isPlaying = true;
+    // The resume functionality of the internal queue i.e. the playlist is insignificant.
+    // Different resume/pause states for internal/main queue need not be maintained.
+    this._isPlaying = true;
+  }
+
+  isPlaying() {
+    return this._isPlaying;
   }
 
   //iterates the queue
