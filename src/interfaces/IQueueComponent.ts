@@ -21,6 +21,7 @@ export interface IVideoComponent {
     videoId: string;
     title: string;
     duration: string;
+    outputPath: string;
     description?: string;
   };
 }

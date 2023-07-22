@@ -10,6 +10,12 @@ it("should throw an error if a wrong bot prefix has been supplied while trying t
   );
 });
 
+it("dsakdjaskl", () => {
+  const messageString = "8====D SKIP GEBBERISH 512";
+  const resultFn = getMessageContent(messageString);
+  expect(resultFn).toEqual({ command: "SKIP", message: "GEBBERISH 512" });
+});
+
 it("should fail if there's no content in the message string", () => {
   const messageString = "8====D";
   const resultFn = () => getMessageContent(messageString);

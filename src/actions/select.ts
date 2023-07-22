@@ -7,6 +7,7 @@ import {
   codeBlock,
   escapeSpoiler,
 } from "discord.js";
+import path from "path";
 import Levels from "../enums/levels";
 import { getVideoIdFromURL, isValidHttpUrl } from "../utils/youtube/urlUtils";
 import { getVideo, searchVideos } from "../utils/youtube/videoService";
@@ -18,6 +19,7 @@ const select = async (messagePayload: string, message: Message) => {
   if (isValidHttpUrl(messagePayload)) {
     const videoId = getVideoIdFromURL(messagePayload);
     const videoInfo = await getVideo(videoId);
+    const guildId = message.guildId;
 
     return enqueue({
       message,
@@ -30,6 +32,10 @@ const select = async (messagePayload: string, message: Message) => {
           title: videoInfo.title,
           duration: videoInfo.duration,
           description: videoInfo.description,
+          outputPath: path.join(
+            global.appRoot,
+            `./outputs/${guildId}/${videoId}.mp3`
+          ),
         },
       },
     });
@@ -106,6 +112,7 @@ const select = async (messagePayload: string, message: Message) => {
     }
 
     const all_options = selections.get(sentMessage.id);
+    selections.delete(sentMessage.id);
     const selected_option = all_options[selectedIndex];
 
     return enqueue({
@@ -118,6 +125,10 @@ const select = async (messagePayload: string, message: Message) => {
           videoId: selected_option.videoId,
           title: selected_option.title,
           duration: selected_option.duration,
+          outputPath: path.join(
+            global.appRoot,
+            `./outputs/${selected_option.videoId}.mp3`
+          ),
         },
       },
     });

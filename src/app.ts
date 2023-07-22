@@ -16,7 +16,7 @@ import help from "./actions/help";
 import logger from "./loaders/logger";
 import addPlaylist from "./actions/addPlaylist";
 import skipPlaylist from "./actions/player/skipPlaylist";
-import forceStop from "./actions/player/forceStop";
+import stop from "./actions/player/stop";
 
 loadYT_API_Key();
 
@@ -78,7 +78,7 @@ const main = async () => {
         skipPlaylist(message);
         break;
       case COMMANDS.STOP.toLowerCase():
-        forceStop(message);
+        stop(message);
         break;
       case COMMANDS.QUEUE.toLowerCase():
         showPlaying(message);

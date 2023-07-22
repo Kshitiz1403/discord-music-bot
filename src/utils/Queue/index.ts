@@ -7,20 +7,17 @@ export function isPlaylist(e: Queue | IVideoComponent): e is Queue {
   return (<Queue>e).type == "PLAYLIST";
 }
 
-
-export function isVideo(
-  e: Queue | IVideoComponent
-): e is IVideoComponent {
-  return (<IVideoComponent>e).message !== undefined;
+export function isVideo(e: Queue | IVideoComponent): e is IVideoComponent {
+  return (<IVideoComponent>e)?.message !== undefined;
 }
 
 class Queue {
   // Index, (Video | Playlist)
-   items: Map<number, IVideoComponent | Queue>;
-   headIndex: number;
-   tailIndex: number;
-   _isPlaying: boolean;
-   type: "PLAYLIST" | "VIDEO";
+  items: Map<number, IVideoComponent | Queue>;
+  headIndex: number;
+  tailIndex: number;
+  _isPlaying: boolean;
+  type: "PLAYLIST" | "VIDEO";
   constructor(type: "PLAYLIST" | "VIDEO" = "VIDEO") {
     this.items = new Map<number, IVideoComponent | Queue>();
     this.headIndex = 0;
@@ -100,11 +97,30 @@ class Queue {
     }
   }
 
+  *videoIterator(): Generator<IVideoComponent> {
+    let i = this.headIndex;
+    while (i < this.tailIndex) {
+      let component = this.items.get(i);
+      if (isVideo(component)) yield component;
+      else {
+        let pIndex = 0;
+        let playlistEnd = component.tailIndex;
+        while (pIndex < playlistEnd) {
+          const comp = component.items.get(pIndex);
+          if (isVideo(comp)) yield comp;
+          pIndex++;
+        }
+      }
+      i++;
+    }
+  }
+
   //empty the queue
   clear() {
     this.items.clear();
     this.headIndex = 0;
     this.tailIndex = 0;
+    this._isPlaying = true;
   }
 }
 

@@ -8,7 +8,8 @@
     "build": "npx tsc",
     "dev": "nodemon",
     "start": "ts-node ./src/app.ts",
-    "test": "vitest --globals"
+    "test": "vitest --globals",
+    "debug": "yarn run build && node --inspect -r ts-node ./build/src/app.js"
   },
   "dependencies": {
     "@discordjs/voice": "^0.16.0",
@@ -16,11 +17,13 @@
     "discord.js": "^14.11.0",
     "dotenv": "^16.3.1",
     "ffmpeg-static": "^5.1.0",
+    "fs-extra": "^11.1.1",
     "libsodium-wrappers": "^0.7.11",
     "winston": "^3.10.0",
     "youtube-dl-exec": "^2.4.6"
   },
   "devDependencies": {
+    "@types/fs-extra": "^11.0.1",
     "eslint": "^8.45.0",
     "nodemon": "^3.0.1",
     "prettier": "^3.0.0",
