@@ -28,11 +28,6 @@ const dequeueOperation = (
   player: AudioPlayer
 ) => {
   player.stop(true);
-
-  setTimeout(() => {
-    logger.silly(`Deleting file ${outputPath}`);
-    fs.unlink(outputPath, (err) => err && logger.error(`🔥 ${err}`));
-  }, 10000);
 };
 
 const deque = (
@@ -76,7 +71,7 @@ const deque = (
   /**
    * Okay now this is last 🙂
    */
-  console.log(++count)
+  console.log(++count);
   if (mainQueue.isEmpty()) return nothingToPlay(message);
 
   let typeOfItem = mainQueue.peek();
