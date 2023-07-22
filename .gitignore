@@ -3,3 +3,4 @@ node_modules/
 round_robin_YT_KEY.txt
 outputs/
 *.log
+build/
