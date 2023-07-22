@@ -1,17 +1,8 @@
 import { IVideoComponent } from "../../../interfaces/IQueueComponent";
+import * as durationFNS from "duration-fns";
 
 function YTDurationToSeconds(duration: string) {
-  let match: any = duration.match(/PT(\d+H)?(\d+M)?(\d+S)?/);
-
-  match = match.slice(1).map(function (x: string) {
-    if (x != null) {
-      return x.replace(/\D/, "");
-    }
-  });
-
-  let hours = parseInt(match[0]) || 0;
-  let minutes = parseInt(match[1]) || 0;
-  let seconds = parseInt(match[2]) || 0;
+  const { hours, minutes, seconds } = durationFNS.parse(duration);
 
   return {
     hours,
@@ -21,9 +12,7 @@ function YTDurationToSeconds(duration: string) {
   };
 }
 
-const formatDuration = (
-  duration: IVideoComponent["options"]["duration"]
-) => {
+const formatDuration = (duration: IVideoComponent["options"]["duration"]) => {
   const durationObj = YTDurationToSeconds(duration);
 
   const durationFormatted = `(${
@@ -33,7 +22,7 @@ const formatDuration = (
   }:${
     durationObj.seconds > 9 ? durationObj.seconds : "0" + durationObj.seconds
   })`;
-  return durationFormatted
+  return durationFormatted;
 };
 
 export default formatDuration;
