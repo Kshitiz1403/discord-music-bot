@@ -113,6 +113,7 @@ const select = async (messagePayload: string, message: Message) => {
 
     const all_options = selections.get(sentMessage.id);
     const selected_option = all_options[selectedIndex];
+    selections.delete(sentMessage.id);
 
     return enqueue({
       message: message,

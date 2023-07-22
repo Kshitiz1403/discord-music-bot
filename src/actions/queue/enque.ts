@@ -46,9 +46,13 @@ const enqueue = async (queueComponent: IQueueComponent) => {
     switch (queueComponent.type) {
       case "VIDEO":
         message.channel.send(
-          `${queueComponent.video.options.title} ${formatDuration(
-            queueComponent.video.options.duration
-          )} added to the queue.`
+          bold(
+            codeBlock(
+              `${queueComponent.video.options.title} ${formatDuration(
+                queueComponent.video.options.duration
+              )} added to the queue.`
+            )
+          )
         );
         break;
     }
