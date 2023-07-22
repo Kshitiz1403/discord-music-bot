@@ -70,7 +70,7 @@ const play = async (videoComponent: IVideoComponent) => {
     )
   );
 
-  connection.on(VoiceConnectionStatus.Disconnected, () => forceStop(message));
+//  connection.on(VoiceConnectionStatus.Disconnected, () => forceStop(message));
 
   playerStatusEmitter.on(
     PlayerEvents.FORCE_STOP,
