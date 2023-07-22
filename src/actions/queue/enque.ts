@@ -27,7 +27,7 @@ const enqueue = async (queueComponent: IQueueComponent) => {
       } ${formatDuration(video.options.duration)}\n`;
       acknowledgementMessage += singleMessage;
     });
-    const MAX_LENGTH = 1990;
+    const MAX_LENGTH = 1900;
     const messages = splitStringToMessages(acknowledgementMessage, MAX_LENGTH);
     for (const msg of messages) {
       await message.channel.send(bold(codeBlock(msg)));
@@ -46,9 +46,9 @@ const enqueue = async (queueComponent: IQueueComponent) => {
     switch (queueComponent.type) {
       case "VIDEO":
         message.channel.send(
-          `${queueComponent.video.options.title} (${formatDuration(
+          `${queueComponent.video.options.title} ${formatDuration(
             queueComponent.video.options.duration
-          )}) added to the queue.`
+          )} added to the queue.`
         );
         break;
     }

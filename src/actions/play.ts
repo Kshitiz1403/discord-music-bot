@@ -47,21 +47,16 @@ const play = async (videoComponent: IVideoComponent) => {
   const player = createAudioPlayer();
   const subscribe$ = connection.subscribe(player);
 
-  const outputPath = path.join(
-    global.appRoot,
-    `./outputs/${options.videoId}.mp3`
-  );
-
   const status = await youtubeDl.exec(youtube_url, {
     noCheckCertificates: true,
     noWarnings: true,
     preferFreeFormats: true,
     addHeader: ["referer:youtube.com", "user-agent:googlebot"],
     format: "bestaudio/best[height<=480]",
-    output: outputPath,
+    output: videoComponent.options.outputPath,
   });
 
-  const resource = createAudioResource(outputPath);
+  const resource = createAudioResource(videoComponent.options.outputPath);
 
   player.play(resource);
 
@@ -93,10 +88,6 @@ const play = async (videoComponent: IVideoComponent) => {
   player.on("stateChange", (oldOne, newOne) => {
     if (newOne.status == AudioPlayerStatus.Idle) {
       // Song finished
-      setTimeout(() => {
-        logger.silly(`Deleting file ${outputPath}`);
-        fs.unlink(outputPath, (err) => err && logger.error(`🔥 ${err}`));
-      }, 2000);
       deque(message);
       return;
     }

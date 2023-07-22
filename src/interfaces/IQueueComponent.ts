@@ -22,5 +22,6 @@ export interface IVideoComponent {
     title: string;
     duration: string;
     description?: string;
+    outputPath: string;
   };
 }

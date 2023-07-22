@@ -13,8 +13,10 @@ import { getVideo, searchVideos } from "../utils/youtube/videoService";
 import formatVideoSuggestions from "../utils/botMessage/formatters/formatVideoSuggestions";
 import enqueue from "./queue/enque";
 import selections from "../store/selections";
+import path from "path";
 
 const select = async (messagePayload: string, message: Message) => {
+  const guildId = message.guildId;
   if (isValidHttpUrl(messagePayload)) {
     const videoId = getVideoIdFromURL(messagePayload);
     const videoInfo = await getVideo(videoId);
@@ -30,6 +32,10 @@ const select = async (messagePayload: string, message: Message) => {
           title: videoInfo.title,
           duration: videoInfo.duration,
           description: videoInfo.description,
+          outputPath: path.join(
+            global.appRoot,
+            `/outputs/${guildId}/${videoId}`
+          ),
         },
       },
     });
@@ -118,6 +124,10 @@ const select = async (messagePayload: string, message: Message) => {
           videoId: selected_option.videoId,
           title: selected_option.title,
           duration: selected_option.duration,
+          outputPath: path.join(
+            global.appRoot,
+            `/outputs/${guildId}/${selected_option.videoId}`
+          ),
         },
       },
     });
