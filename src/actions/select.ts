@@ -14,32 +14,12 @@ import formatVideoSuggestions from "../utils/botMessage/formatters/formatVideoSu
 import enqueue from "./queue/enque";
 import selections from "../store/selections";
 import path from "path";
+import play from "./play";
 
 const select = async (messagePayload: string, message: Message) => {
   const guildId = message.guildId;
-  if (isValidHttpUrl(messagePayload)) {
-    const videoId = getVideoIdFromURL(messagePayload);
-    const videoInfo = await getVideo(videoId);
-
-    return enqueue({
-      message,
-      type: "VIDEO",
-      video: {
-        youtube_url: messagePayload,
-        message,
-        options: {
-          videoId,
-          title: videoInfo.title,
-          duration: videoInfo.duration,
-          description: videoInfo.description,
-          outputPath: path.join(
-            global.appRoot,
-            `/outputs/${guildId}/${videoId}`
-          ),
-        },
-      },
-    });
-  }
+  
+  if (isValidHttpUrl(messagePayload)) return play(messagePayload, message);
 
   const suggestions = await searchVideos(messagePayload);
 

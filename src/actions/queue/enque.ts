@@ -3,7 +3,7 @@ import { IQueueComponent } from "../../interfaces/IQueueComponent";
 import music_queue from "../../store/music_queue";
 import Queue from "../../utils/Queue";
 import { formatDuration } from "../../utils/botMessage/formatters";
-import play from "../play";
+import play from "../player/play";
 import splitStringToMessages from "../../utils/botMessage/formatters/splitStringToMessages";
 
 const enqueue = async (queueComponent: IQueueComponent) => {

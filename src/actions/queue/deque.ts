@@ -2,7 +2,7 @@ import { getVoiceConnection } from "@discordjs/voice";
 import playerStatusEmitter from "../../events/audioPlayer";
 import { IQueueComponent } from "../../interfaces/IQueueComponent";
 import music_queue from "../../store/music_queue";
-import play from "../play";
+import play from "../player/play";
 import { bold, codeBlock } from "discord.js";
 import { isPlaylist, isVideo } from "../../utils/Queue";
 

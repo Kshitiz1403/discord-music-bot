@@ -85,19 +85,21 @@ async function getVideoHelper(videoId: string) {
   };
 }
 
-async function searchVideosHelper(search_term: string) {
-  const LIMIT = 5;
+async function searchVideosHelper(
+  search_term: string,
+  options: { LIMIT: number } = { LIMIT: 5 }
+) {
   const allVideos = await (
     await axios.get(`https://www.googleapis.com/youtube/v3/search`, {
       params: {
         part: "snippet",
-        maxResults: LIMIT,
+        maxResults: options.LIMIT,
         q: search_term,
         type: "video",
         key: getYT_API_Key(),
       },
     })
-  ).data.items.slice(0, LIMIT);
+  ).data.items.slice(0, options.LIMIT);
 
   let videoInfoPromises = [];
   const videosRaw = allVideos.map((video) => {
@@ -138,9 +140,15 @@ export async function getVideo(
 }
 
 export async function searchVideos(
-  search_term: string
+  search_term: string,
+  options: { LIMIT: number } = { LIMIT: 5 }
 ): ReturnType<typeof searchVideosHelper> {
-  return retryableFunction(searchVideosHelper, totalKeys(), search_term);
+  return retryableFunction(
+    searchVideosHelper,
+    totalKeys(),
+    search_term,
+    options
+  );
 }
 
 export async function getPlaylist(
