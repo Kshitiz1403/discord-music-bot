@@ -17,6 +17,7 @@ import logger from "./loaders/logger";
 import addPlaylist from "./actions/addPlaylist";
 import skipPlaylist from "./actions/player/skipPlaylist";
 import forceStop from "./actions/player/forceStop";
+import play from "./actions/play";
 
 loadYT_API_Key();
 
@@ -60,6 +61,9 @@ const main = async () => {
 
     switch (command.toLowerCase()) {
       case COMMANDS.PLAY.toLowerCase():
+        play(messageContent, message);
+        break;
+      case COMMANDS.SEARCH.toLowerCase():
         select(messageContent, message);
         break;
       case COMMANDS.ADD_PLAYLIST.toLowerCase():

@@ -1,5 +1,6 @@
 enum COMMANDS {
   PLAY = "PLAY",
+  SEARCH = "SEARCH",
   PAUSE = "PAUSE",
   RESUME = "RESUME",
   SKIP = "SKIP",
