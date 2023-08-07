@@ -4,7 +4,7 @@ import { IQueueComponent } from "../../interfaces/IQueueComponent";
 import music_queue from "../../store/music_queue";
 import play from "../player/play";
 import { bold, codeBlock } from "discord.js";
-import { isPlaylist, isVideo } from "../../utils/Queue";
+import { isPlaylist, isVideo } from "../../interfaces/IQueueComponent";
 
 const deque = (
   message: IQueueComponent["message"],

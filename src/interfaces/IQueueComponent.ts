@@ -1,4 +1,16 @@
 import { Message } from "discord.js";
+import Queue from "../utils/Queue";
+
+export function isPlaylist(e: Queue | IVideoComponent): e is Queue {
+  return (<Queue>e).type == "PLAYLIST";
+}
+
+
+export function isVideo(
+  e: Queue | IVideoComponent
+): e is IVideoComponent {
+  return (<IVideoComponent>e).message !== undefined;
+}
 
 type IPlaylistWrapper = {
   message: IVideoComponent["message"];

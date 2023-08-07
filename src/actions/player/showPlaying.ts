@@ -2,7 +2,7 @@ import { bold, codeBlock } from "discord.js";
 import { IQueueComponent } from "../../interfaces/IQueueComponent";
 import music_queue from "../../store/music_queue";
 import { formatDuration, truncate } from "../../utils/botMessage/formatters";
-import { isPlaylist, isVideo } from "../../utils/Queue";
+import { isPlaylist, isVideo } from "../../interfaces/IQueueComponent";
 import splitStringToMessages from "../../utils/botMessage/formatters/splitStringToMessages";
 
 const showPlaying = (message: IQueueComponent["message"]) => {
@@ -26,33 +26,30 @@ const showPlaying = (message: IQueueComponent["message"]) => {
    * Two cases -> Playing inside a playlist, playing as a video
    */
   for (let it of iterator) {
-    if (count == 0) {
-      messageString += "🔊 Now Playing: \n";
-    }
-    if (isPlaylist(it)) {
-      const playlistIterator = it.iterator();
-      for (const pt of playlistIterator) {
-        if (!isVideo(pt)) continue;
-
-        messageString += `(Playlist) ${truncate(
-          pt.options.title,
-          50
-        )}  ${formatDuration(pt.options.duration)}\n`;
-        if (count == 0) {
-          messageString += "\n";
-          messageString += "🔊 Up Next: \n";
-        }
-        count++;
-      }
-    } else {
-      messageString += `${truncate(it.options.title, 50)}  ${formatDuration(
-        it.options.duration
+    const unitSongMessage = (title, duration) => {
+      messageString += `(Playlist) ${truncate(title, 50)}  ${formatDuration(
+        duration
       )}\n`;
       if (count == 0) {
         messageString += "\n";
         messageString += "🔊 Up Next: \n";
       }
       count++;
+    };
+
+
+    if (count == 0) {
+      messageString += "🔊 Now Playing: \n";
+    }
+
+    if (isPlaylist(it)) {
+      const playlistIterator = it.iterator();
+      for (const pt of playlistIterator) {
+        if (!isVideo(pt)) continue;
+        unitSongMessage(pt.options.title, pt.options.duration);
+      }
+    } else {
+      unitSongMessage(it.options.title, it.options.duration);
     }
 
     if (count == 0) {
@@ -65,7 +62,7 @@ const showPlaying = (message: IQueueComponent["message"]) => {
     messageString += "No tracks here\n";
   }
 
-  let shortMessage:string = splitStringToMessages(messageString, 1000)[0];
+  let shortMessage: string = splitStringToMessages(messageString, 1000)[0];
   if (messageString.length > shortMessage.length) {
     shortMessage += ".\n";
     shortMessage += ".\n";
