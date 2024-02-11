@@ -15,10 +15,14 @@ import enqueue from "./queue/enque";
 import selections from "../store/selections";
 import path from "path";
 import play from "./play";
+import logger from "../loaders/logger";
 
 const select = async (messagePayload: string, message: Message) => {
   const guildId = message.guildId;
-  
+  logger.info("[SERVER ID] " + guildId);
+  logger.info("[ACTION] select");
+  logger.info("[MESSAGE] " + messagePayload);
+
   if (isValidHttpUrl(messagePayload)) return play(messagePayload, message);
 
   const suggestions = await searchVideos(messagePayload);

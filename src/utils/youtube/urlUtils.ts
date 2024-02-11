@@ -22,6 +22,11 @@ export const isValidHttpUrl = (string: string) => {
   return url.protocol === "http:" || url.protocol === "https:";
 };
 
+export const isSpotifyURL = (url: string) => {
+  // TODO: THIS NEEDS TO BE MATCHED USING REGEX
+  return url.includes("spotify.com");
+};
+
 const isYTMusic = (url: string) => {
   url = url.replace("music.youtube.com", "youtube.com");
 
