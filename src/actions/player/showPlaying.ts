@@ -4,8 +4,11 @@ import music_queue from "../../store/music_queue";
 import { formatDuration, truncate } from "../../utils/botMessage/formatters";
 import { isPlaylist, isVideo } from "../../interfaces/IQueueComponent";
 import splitStringToMessages from "../../utils/botMessage/formatters/splitStringToMessages";
+import logger from "../../loaders/logger";
 
 const showPlaying = (message: IQueueComponent["message"]) => {
+  logger.info("[SERVER ID] " + message.guildId);
+  logger.info("[ACTION] showPlaying");
   if (
     !music_queue.has(message.guildId) ||
     music_queue.get(message.guildId).isEmpty()
@@ -36,7 +39,6 @@ const showPlaying = (message: IQueueComponent["message"]) => {
       }
       count++;
     };
-
 
     if (count == 0) {
       messageString += "🔊 Now Playing: \n";
