@@ -19,6 +19,7 @@
     "ffmpeg-static": "^5.1.0",
     "fs-extra": "^11.1.1",
     "libsodium-wrappers": "^0.7.11",
+    "uuid": "^9.0.1",
     "winston": "^3.10.0",
     "youtube-dl-exec": "^2.4.6"
   },
