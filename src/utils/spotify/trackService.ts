@@ -38,7 +38,7 @@ const playlistToYT = async (playlistID: string): Promise<IPlaylist> => {
 };
 
 const spotifyToYT = async (spotifyURL: string) => {
-  if (playdl.is_expired()) playdl.refreshToken();
+  if (playdl.is_expired()) await playdl.refreshToken();
 
   const spotifyResponse = await playdl.spotify(spotifyURL);
 
