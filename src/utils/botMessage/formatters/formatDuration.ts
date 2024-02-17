@@ -1,7 +1,7 @@
 import { IVideoComponent } from "../../../interfaces/IQueueComponent";
 import * as durationFNS from "duration-fns";
 
-function YTDurationToSeconds(duration: string) {
+export function YTDurationToSeconds(duration: string) {
   const { hours, minutes, seconds } = durationFNS.parse(duration);
 
   return {
