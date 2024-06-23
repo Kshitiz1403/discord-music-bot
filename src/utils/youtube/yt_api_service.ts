@@ -12,7 +12,7 @@ let KEY = "";
 let KEY_INDEX = -1;
 const FILE_PATH = path.join(global.appRoot, "./round_robin_YT_KEY.txt");
 
-export const loadYT_API_Key = () => {
+export const loadYouTubeAPIKey = () => {
   if (!fs.existsSync(FILE_PATH)) {
     KEY_INDEX = 0;
     saveKey();
@@ -24,7 +24,7 @@ export const loadYT_API_Key = () => {
 };
 
 export const getYT_API_Key = () => {
-  if (!KEY) loadYT_API_Key();
+  if (!KEY) loadYouTubeAPIKey();
   return KEY;
 };
 
