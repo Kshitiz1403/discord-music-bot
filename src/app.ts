@@ -6,7 +6,7 @@ import config from "../config";
 import { ActivityType, Client, Events, GatewayIntentBits } from "discord.js";
 import { shouldBotTrigger, getMessageContent } from "./utils/botMessage";
 import COMMANDS from "./enums/commands";
-import { loadYT_API_Key } from "./utils/youtube/yt_api_service";
+import { loadYouTubeAPIKey } from "./utils/youtube/yt_api_service";
 import select from "./actions/select";
 import pause from "./actions/player/pause";
 import resume from "./actions/player/resume";
@@ -19,9 +19,9 @@ import skipPlaylist from "./actions/player/skipPlaylist";
 import forceStop from "./actions/player/forceStop";
 import play from "./actions/play";
 
-loadYT_API_Key();
 
 const main = async () => {
+  loadYouTubeAPIKey();
   const client = new Client({
     intents: [
       GatewayIntentBits.Guilds,
