@@ -72,11 +72,11 @@ const play = async (videoComponent: IVideoComponent) => {
    * Calculates the unit interval for moving atleast 1% of the playback based on the total resource seconds.
    * The unit interval is the maximum of 2000 or the total resource seconds divided by 100, rounded down to the nearest integer.
    *
-   * @param totalResourceSeconds - The total resource seconds.
+   * @param totalResourceMS - The total resource milliseconds.
    * @returns The calculated unit interval.
    */
-  const getUnitInterval = (totalResourceSeconds: number) =>{
-    return Math.max(2000, Math.floor(totalResourceSeconds / 100))
+  const getUnitInterval = (totalResourceMS: number) =>{
+    return Math.max(2000, Math.floor(totalResourceMS / 100))
   }
   
   const interval = IntervalTimer(() => {
@@ -90,7 +90,7 @@ const play = async (videoComponent: IVideoComponent) => {
         )
       )
     );
-  }, getUnitInterval(resource.playbackDuration / 1000));
+  }, getUnitInterval(resource.playbackDuration));
 
   //  connection.on(VoiceConnectionStatus.Disconnected, () => forceStop(message));
 
